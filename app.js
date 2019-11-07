@@ -1,3 +1,11 @@
+// display the current time
+const arrivalTime = new Date()
+const t = arrivalTime.toTimeString();
+const tShort = t.substring(0, 5);
+$("#curTime").text(tShort)
+
+
+
 // jquery selectors
 // train-times-table
 const trainTableBody = $("#train-table-body");
