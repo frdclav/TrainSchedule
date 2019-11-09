@@ -239,9 +239,10 @@ newTrainSubmitBtn.on('click', function(event) {
 // display the current time
 
 setInterval(function() {
-    const arrivalTime = new Date()
-    const t = arrivalTime.toTimeString();
-    const tShort = t
-        // .substring(0, 5);
-    $("#curTime").text(tShort)
-}, 500);
+    // const arrivalTime = new Date()
+    // const t = arrivalTime.toTimeString();
+    // const tShort = t
+    // .substring(0, 5);
+    // console.log(moment().format("HH:mm:ss"));
+    $("#curTime").text(moment().format("HH:mm:ss"))
+}, 100);
