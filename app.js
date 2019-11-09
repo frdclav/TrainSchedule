@@ -22,7 +22,108 @@ const newTrainObj = function(name, dest, time, freq) {
 // array of train objects 
 let trainObjArr = [];
 
+// MOMENT.JS stuff =========================================================
+// =========================================================================
+// Assume the following situations.
 
+// (TEST 1)
+// First Train of the Day is 3:00 AM
+// Assume Train comes every 3 minutes.
+// Assume the current time is 3:16 AM....
+// What time would the next train be...? (Use your brain first)
+// It would be 3:18 -- 2 minutes away
+
+// (TEST 2)
+// First Train of the Day is 3:00 AM
+// Assume Train comes every 7 minutes.
+// Assume the current time is 3:16 AM....
+// What time would the next train be...? (Use your brain first)
+// It would be 3:21 -- 5 minutes away
+
+
+// ==========================================================
+
+// Solved Mathematically
+// Test case 1:
+// 16 - 00 = 16
+// 16 % 3 = 1 (Modulus is the remainder)
+// 3 - 1 = 2 minutes away
+// 2 + 3:16 = 3:18
+
+// Solved Mathematically
+// Test case 2:
+// 16 - 00 = 16
+// 16 % 7 = 2 (Modulus is the remainder)
+// 7 - 2 = 5 minutes away
+// 5 + 3:16 = 3:21
+
+// // Assumptions
+// var tFrequency = 3;
+
+// // Time is 3:30 AM
+// var firstTime = "03:30";
+
+// // First Time (pushed back 1 year to make sure it comes before current time)
+// var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
+// console.log(firstTimeConverted);
+
+// // Current Time
+// var currentTime = moment();
+// console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+
+// // Difference between the times
+// var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+// console.log("DIFFERENCE IN TIME: " + diffTime);
+
+// // Time apart (remainder)
+// var tRemainder = diffTime % tFrequency;
+// console.log(tRemainder);
+
+// // Minute Until Train
+// var tMinutesTillTrain = tFrequency - tRemainder;
+// console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+// // Next Train
+// var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+// console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
+
+
+// calculate next Arrival
+
+// trainArrival object constructer
+const trainArrival = function(firstTime, freq) {
+    this.firstTime = firstTime;
+    this.freq = freq;
+    self = this;
+
+};
+const calcNextArrival = (time, freq) => {
+        var currentTime = moment();
+        // console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+        var firstTime = time;
+        // First Time (pushed back 1 year to make sure it comes before current time)
+        var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
+        // console.log(firstTimeConverted);
+
+        // Difference between the times
+        var diffTime = currentTime.diff(moment(firstTimeConverted), "minutes");
+        // console.log("DIFFERENCE IN TIME: " + diffTime);
+
+        // Time apart (remainder)
+        var tRemainder = diffTime % freq;
+        // console.log(tRemainder);
+
+        // Minute Until Train
+        var tMinutesTillTrain = freq - tRemainder;
+        // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+        // Next Train
+        var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+        // console.log("ARRIVAL TIME: " + moment(nextTrain).format("HH:mm"));
+        return [tMinutesTillTrain, moment(nextTrain).format("HH:mm")]
+    }
+    // MOMENT.JS stuff =========================================================
+    // =========================================================================
 
 
 //  function to showNewTrain on table
@@ -36,9 +137,9 @@ const showNewTrain = (train) => {
     const trainFreq = $("<td>");
     trainFreq.text(train.freq);
     const trainNextArrival = $("<td>");
-    trainNextArrival.text(train.time);
+    trainNextArrival.text(calcNextArrival(train.time, train.freq)[1]);
     const trainMinsAway = $("<td>");
-    trainMinsAway.text("0");
+    trainMinsAway.text(calcNextArrival(train.time, train.freq)[0]);
     tableRow.append(tableHead);
     tableRow.append(trainDest);
     tableRow.append(trainFreq);
