@@ -16,7 +16,7 @@ const newTrainObj = function(name, dest, time, freq) {
     this.time = time;
     this.freq = freq;
 
-    console.log(this);
+    // console.log(this);
 };
 
 // array of train objects 
@@ -108,13 +108,13 @@ const calcNextArrival = (time, freq) => {
         // Difference between the times
         var diffTime = currentTime.diff(moment(firstTimeConverted), "minutes");
         // console.log("DIFFERENCE IN TIME: " + diffTime);
-
+        // console.log('freq', freq)
         // Time apart (remainder)
-        var tRemainder = diffTime % freq;
+        var tRemainder = diffTime % parseInt(freq);
         // console.log(tRemainder);
 
         // Minute Until Train
-        var tMinutesTillTrain = freq - tRemainder;
+        var tMinutesTillTrain = parseInt(freq) - tRemainder;
         // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
 
         // Next Train
@@ -136,10 +136,37 @@ const showNewTrain = (train) => {
     trainDest.text(train.dest)
     const trainFreq = $("<td>");
     trainFreq.text(train.freq);
+
+    // train time calculations and updates
+    // create random identifier for updating times
+    const random_id = Math.floor(Math.random() * 1000000000001);
+
     const trainNextArrival = $("<td>");
+    trainNextArrival.attr('data-first-train-time', train.time)
+    trainNextArrival.attr('data-freq', parseInt(train.freq))
+
+    trainNextArrival.attr('id', random_id + "-next-arrival")
     trainNextArrival.text(calcNextArrival(train.time, train.freq)[1]);
     const trainMinsAway = $("<td>");
+    trainMinsAway.attr('data-first-train-time', train.time);
+    trainMinsAway.attr('data-freq', parseInt(train.freq));
+
+    trainMinsAway.attr('id', random_id + "-mins-away");
     trainMinsAway.text(calcNextArrival(train.time, train.freq)[0]);
+
+    // create interval
+    // for updating the times
+    setInterval(function() {
+
+        var nextArr = '#' + random_id + '-next-arrival';
+        var minsAway = '#' + random_id + '-mins-away';
+        // console.log(calcNextArrival($(nextArr).attr('data-first-train-time'), parseInt($(nextArr).attr('data-freq')))[1], calcNextArrival($(minsAway).attr('data-first-train-time'), parseInt($(minsAway).attr('data-freq')))[0])
+        $(nextArr).text(calcNextArrival($(nextArr).attr('data-first-train-time'), parseInt($(nextArr).attr('data-freq')))[1]);
+        $(minsAway).text(calcNextArrival($(minsAway).attr('data-first-train-time'), parseInt($(minsAway).attr('data-freq')))[0]);
+
+    }, 1000)
+
+    // end train time calculations and updates
     tableRow.append(tableHead);
     tableRow.append(trainDest);
     tableRow.append(trainFreq);
@@ -198,14 +225,23 @@ ref.on('child_added', function(snapshot) {
 
 newTrainSubmitBtn.on('click', function(event) {
     event.preventDefault();
+    if ((/^([01]\d|2[0-3]):?([0-5]\d)$/.test(newTrainTime.val()) && newTrainTime.val() <= 2301) && (/^[0-9]*$/.test(newTrainFreq.val())) && (newTrainName.val() !== '') && (newTrainDest.val() !== '')) {
+        console.log('it matches!')
+        let newTrain = new newTrainObj(newTrainName.val(), newTrainDest.val(), newTrainTime.val(), newTrainFreq.val());
+        trainObjArr.push(newTrain);
+        console.log('currently:', trainObjArr)
+        pushNewTrain(newTrain);
+    } else {
+        alert('Please make sure that all fields are correctly filled out.')
+    }
 
-    let newTrain = new newTrainObj(newTrainName.val(), newTrainDest.val(), newTrainTime.val(), newTrainFreq.val());
-    trainObjArr.push(newTrain);
-    console.log('currently:', trainObjArr)
-    pushNewTrain(newTrain);
 });
 // display the current time
-const arrivalTime = new Date()
-const t = arrivalTime.toTimeString();
-const tShort = t.substring(0, 5);
-$("#curTime").text(tShort)
+
+setInterval(function() {
+    const arrivalTime = new Date()
+    const t = arrivalTime.toTimeString();
+    const tShort = t
+        // .substring(0, 5);
+    $("#curTime").text(tShort)
+}, 500);
